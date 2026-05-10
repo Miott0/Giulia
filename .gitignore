@@ -1,0 +1,15 @@
+# Rust
+/target
+
+# Visual Studio Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Editor backups
+*.swp
+*.tmp

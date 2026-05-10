@@ -1,0 +1,14 @@
+[workspace]
+members = [
+	"crates/crl-lexer",
+	"crates/crl-ast",
+	"crates/crl-parser",
+	"crates/crl-interpreter",
+	"crates/crl-cli",
+]
+resolver = "2"
+
+[workspace.dependencies]
+logos = "0.14"
+thiserror = "1.0"
+miette = { version = "5.10", features = ["fancy"] }

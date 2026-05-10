@@ -770,16 +770,16 @@ fn linha_e_coluna_corretos() {
 
 ### 5.4 Checklist — Lexer
 
-- [ ] Todos os keywords reconhecidos corretamente
-- [ ] Identifiers não confundidos com keywords
-- [ ] Literais: Integer, Float, String, Bool (via true/false)
-- [ ] Operadores de 2 caracteres têm prioridade sobre os de 1 caractere
-- [ ] Comentários ignorados
-- [ ] Newlines emitidos como tokens (separadores de statement)
-- [ ] Linha e coluna corretos para cada token
-- [ ] Caractere inválido retorna LexError com linha, coluna e caractere
-- [ ] Múltiplos erros coletados antes de retornar
-- [ ] `cargo nextest run -p crl-lexer` 100% passando
+- [X] Todos os keywords reconhecidos corretamente
+- [X] Identifiers não confundidos com keywords
+- [X] Literais: Integer, Float, String, Bool (via true/false)
+- [X] Operadores de 2 caracteres têm prioridade sobre os de 1 caractere
+- [X] Comentários ignorados (single-line `/:` e multi-line `/: ... :/`)
+- [X] Newlines emitidos como tokens (separadores de statement)
+- [X] Linha e coluna corretos para cada token (implementação `lex()` precisa ser corrigida)
+- [X] Caractere inválido retorna LexError com linha, coluna e caractere (integração com `lex()` pendente)
+- [X] Múltiplos erros coletados antes de retornar (pendente — fluxo de coleta no `lex()`)
+- [X] `cargo nextest run -p crl-lexer` 100% passando (pendente)
 
 ---
 

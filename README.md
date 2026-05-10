@@ -1,10 +1,10 @@
-# CRL — Cognitive Runtime Language
+# Giulia — Cognitive Runtime Language
 
-Repositório do projeto CRL — Fase 0–1 (setup inicial).
+Repositório do projeto Giulia — Fase 0–1 (setup inicial).
 
 Resumo
 - Implementação em Rust; objetivo inicial: lexer, AST, parser, interpreter e CLI (Fase 1).
-- Leia os documentos de especificação: [CRL_FASE_0_1.md](CRL_FASE_0_1.md) e [CRL_MAPA_GERAL.md](CRL_MAPA_GERAL.md).
+- Leia os documentos de especificação: [CRL_FASE_0_1.md](CRL_FASE_0_1.md) and [CRL_MAPA_GERAL.md](CRL_MAPA_GERAL.md).
 
 Setup rápido
 1. Instale o Rust toolchain (rustup):
@@ -30,5 +30,5 @@ O que eu já configurei aqui
 - memória de contexto criada: /memories/repo/memory-context.md
 
 Próximos passos sugeridos
-- Confirmar se deseja que eu crie os crates esqueleto (`crl-lexer`, `crl-ast`, `crl-parser`, `crl-interpreter`, `crl-cli`) agora.
+- Confirmar se deseja que eu crie os crates esqueleto (`giulia-lexer`, `giulia-ast`, `giulia-parser`, `giulia-interpreter`, `giulia`) agora.
 - Ou prefira que eu apenas prepare o ambiente e documente os passos para você executar localmente.

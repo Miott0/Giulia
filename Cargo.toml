@@ -1,10 +1,10 @@
 [workspace]
 members = [
-	"crates/crl-lexer",
-	"crates/crl-ast",
-	"crates/crl-parser",
-	"crates/crl-interpreter",
-	"crates/crl-cli",
+	"crates/giulia-lexer",
+	"crates/giulia-ast",
+	"crates/giulia-parser",
+	"crates/giulia-interpreter",
+	"crates/giulia-cli",
 ]
 resolver = "2"
 

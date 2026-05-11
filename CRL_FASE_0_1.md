@@ -1050,11 +1050,11 @@ pub enum UnaryOp {
 
 ### 6.1 Checklist — AST
 
-- [ ] Todos os nós têm campo `span: Span`
-- [ ] `AgentDecl` contém `uses`, `handlers` e `fns`
-- [ ] `Expr::span()` retorna o Span correto para qualquer variante
-- [ ] `TypeExpr` cobre Int, Float, String, Bool, Null, List<T>, Map<K,V>, Named
-- [ ] Nenhum `unwrap()` ou `panic!()` nos nós do AST
+- [X] Todos os nós têm campo `span: Span`
+- [X] `AgentDecl` contém `uses`, `handlers` e `fns`
+- [X] `Expr::span()` retorna o Span correto para qualquer variante
+- [X] `TypeExpr` cobre Int, Float, String, Bool, Null, List<T>, Map<K,V>, Named
+- [X] Nenhum `unwrap()` ou `panic!()` nos nós do AST
 
 ---
 

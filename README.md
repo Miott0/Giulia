@@ -32,3 +32,8 @@ O que eu já configurei aqui
 Próximos passos sugeridos
 - Confirmar se deseja que eu crie os crates esqueleto (`giulia-lexer`, `giulia-ast`, `giulia-parser`, `giulia-interpreter`, `giulia`) agora.
 - Ou prefira que eu apenas prepare o ambiente e documente os passos para você executar localmente.
+
+
+TESTES
+cargo nextest run -p giulia-ast
+cargo nextest run -p giulia-lexer

@@ -213,6 +213,7 @@ pub enum Expr {
     },
     List(Vec<Expr>, Span),
     Map(Vec<(Expr, Expr)>, Span),
+    FString(Vec<FStringSegment>, Span),
 }
 
 impl Expr {
@@ -227,8 +228,18 @@ impl Expr {
             Expr::Index    { span, .. }  => *span,
             Expr::List     (_, s)        => *s,
             Expr::Map      (_, s)        => *s,
+            Expr::FString  (_, s)        => *s,
         }
     }
+}
+
+// ─── F-STRING ────────────────────────────────────────────────────
+
+/// Segmento de uma f-string: texto literal ou expressão com format spec opcional.
+#[derive(Debug, Clone, PartialEq)]
+pub enum FStringSegment {
+    Lit(String),
+    Expr(Expr, Option<String>),
 }
 
 // ─── LITERAIS ────────────────────────────────────────────────────

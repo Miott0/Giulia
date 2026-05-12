@@ -100,6 +100,13 @@ pub enum Token {
     })]
     StringLit(String),
 
+    /// f-string: f"..." — conteúdo bruto entre aspas (sem o prefixo f).
+    #[regex(r#"f"[^"]*""#, |lex| {
+        let s = lex.slice();
+        Some(s[2..s.len()-1].to_string())
+    })]
+    FString(String),
+
     #[regex(r"[a-zA-Z_][a-zA-Z0-9_]*", |lex| lex.slice().to_string())]
     Identifier(String),
 

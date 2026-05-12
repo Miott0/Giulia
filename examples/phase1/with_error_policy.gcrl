@@ -1,0 +1,13 @@
+/: este script testa que on_error é parseado sem erro na Fase 1 :/
+agent main {
+    on_error {
+        strategy    = "restart_handler"
+        max_retries = 3
+        backoff_ms  = 500
+    }
+
+    on start {
+        let msg = "Agent com error_policy iniciado"
+        print(msg)
+    }
+}

@@ -20,6 +20,7 @@ impl Parser {
         self.tokens.get(self.cursor).map(|t| &t.token).unwrap_or(&Token::Eof)
     }
 
+    #[allow(dead_code)]
     fn peek_next(&self) -> &Token {
         self.tokens.get(self.cursor + 1).map(|t| &t.token).unwrap_or(&Token::Eof)
     }
@@ -482,7 +483,7 @@ impl Parser {
 
     // ── EXPRESSÕES (Pratt / precedência) ─────────────────────────────────────
 
-    fn parse_expr(&mut self) -> Result<Expr, ParseError> { self.parse_or() }
+    pub fn parse_expr(&mut self) -> Result<Expr, ParseError> { self.parse_or() }
 
     fn parse_or(&mut self) -> Result<Expr, ParseError> {
         let mut l = self.parse_and()?;
@@ -607,6 +608,7 @@ impl Parser {
             Token::Float(f)     => { self.advance(); Ok(Expr::Literal(Literal::Float(f), span)) }
             Token::Scientific(f)=> { self.advance(); Ok(Expr::Literal(Literal::Scientific(f), span)) }
             Token::StringLit(s) => { self.advance(); Ok(Expr::Literal(Literal::String(s), span)) }
+            Token::FString(s)   => { self.advance(); let segs = self.parse_fstring_content(&s, span)?; Ok(Expr::FString(segs, span)) }
             Token::True         => { self.advance(); Ok(Expr::Literal(Literal::Bool(true), span)) }
             Token::False        => { self.advance(); Ok(Expr::Literal(Literal::Bool(false), span)) }
             Token::Null         => { self.advance(); Ok(Expr::Literal(Literal::Null, span)) }
@@ -631,6 +633,86 @@ impl Parser {
                 expected: "expressão".into(), found: format!("{:?}", self.peek()), line: l, column: c,
             })
         }
+    }
+
+    // ── F-STRING ──────────────────────────────────────────────────────────────
+
+    fn parse_fstring_content(&mut self, content: &str, outer_span: Span) -> Result<Vec<FStringSegment>, ParseError> {
+        let mut segs = Vec::new();
+        let mut literal = String::new();
+        let chars: Vec<char> = content.chars().collect();
+        let mut i = 0;
+        while i < chars.len() {
+            if chars[i] == '{' {
+                if i + 1 < chars.len() && chars[i + 1] == '{' {
+                    literal.push('{');
+                    i += 2;
+                    continue;
+                }
+                if !literal.is_empty() {
+                    segs.push(FStringSegment::Lit(std::mem::take(&mut literal)));
+                }
+                i += 1;
+                let mut depth = 1u32;
+                let expr_start = i;
+                while i < chars.len() && depth > 0 {
+                    match chars[i] {
+                        '{' => depth += 1,
+                        '}' => depth -= 1,
+                        _ => {}
+                    }
+                    i += 1;
+                }
+                if depth != 0 {
+                    let (l, c) = self.loc();
+                    return Err(ParseError::UnexpectedToken {
+                        expected: "}".into(), found: "EOF in f-string expression".into(), line: l, column: c,
+                    });
+                }
+                let expr_end = i - 1;
+                let expr_text: String = chars[expr_start..expr_end].iter().collect();
+                let (expr_text, format_spec) = if let Some(pos) = expr_text.find(':') {
+                    let (e, f) = expr_text.split_at(pos);
+                    (e.to_string(), Some(f[1..].to_string()))
+                } else {
+                    (expr_text, None)
+                };
+                let expr = self.parse_expr_str(&expr_text, outer_span)?;
+                segs.push(FStringSegment::Expr(expr, format_spec));
+            } else if chars[i] == '}' {
+                if i + 1 < chars.len() && chars[i + 1] == '}' {
+                    literal.push('}');
+                    i += 2;
+                    continue;
+                }
+                let (l, c) = self.loc();
+                return Err(ParseError::UnexpectedToken {
+                    expected: "expressão ou }}".into(), found: "}".into(), line: l, column: c,
+                });
+            } else {
+                literal.push(chars[i]);
+                i += 1;
+            }
+        }
+        if !literal.is_empty() {
+            segs.push(FStringSegment::Lit(literal));
+        }
+        Ok(segs)
+    }
+
+    fn parse_expr_str(&self, text: &str, _span: Span) -> Result<Expr, ParseError> {
+        let tokens = giulia_lexer::lex(text).map_err(|lex_errs| {
+            let first = lex_errs.into_iter().next().unwrap_or(
+                giulia_lexer::error::LexError::UnexpectedCharacter { character: '?', line: 0, column: 0 }
+            );
+            ParseError::UnexpectedToken {
+                expected: "expressão".into(),
+                found: format!("erro léxico: {first}"),
+                line: 0, column: 0,
+            }
+        })?;
+        let mut sub = Parser::new(tokens);
+        sub.parse_expr()
     }
 
     // ── TIPOS ────────────────────────────────────────────────────────────────

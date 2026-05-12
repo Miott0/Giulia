@@ -1,0 +1,14 @@
+agent main {
+    on start {
+        print("Oi, eu sou um agente CRL!")
+        let x = 10
+        let y = 20
+        let z = x + y
+        print(f"10 + 20 = {z}")
+        print(f"{z} em hexa = {z:x}")
+        print(f"{z} em binario = {z:b}")
+        let pi = 3.14159
+        print(f"pi com 2 casas = {pi:.2f}")
+        print(f"literal: {{chaves}}")
+    }
+}

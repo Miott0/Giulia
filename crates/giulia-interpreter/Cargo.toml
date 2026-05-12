@@ -10,3 +10,7 @@ license = "MIT"
 [dependencies]
 giulia-ast = { path = "../giulia-ast" }
 thiserror = { workspace = true }
+
+[dev-dependencies]
+giulia-lexer = { path = "../giulia-lexer" }
+giulia-parser = { path = "../giulia-parser" }

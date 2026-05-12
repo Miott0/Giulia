@@ -1,6 +1,0 @@
-agent main {
-    on start {
-        let msg = "Hello, Cognitive Runtime"
-        print(msg)
-    }
-}

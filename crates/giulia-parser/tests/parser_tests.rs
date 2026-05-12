@@ -316,8 +316,8 @@ fn if_without_else() {
 
 #[test]
 fn error_recovery_multiple_errors() {
-    let errors = parse_err("agent main {\n    on start {\n        bad_token_here\n    }\n}\n");
-    assert!(!errors.is_empty(), "expected at least one parse error");
+    let errors = parse_err("agent main {\n    on start {\n        let = 1\n        let = 2\n    }\n}\n");
+    assert!(errors.len() >= 2, "expected at least two parse errors, got: {}", errors.len());
 }
 
 #[test]

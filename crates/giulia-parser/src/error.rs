@@ -18,7 +18,7 @@ pub enum ParseError {
     },
 
     #[error("Invalid assignment target on row {line}, column {column}")]
-    InvalidAssignmentTarget {
+    InvalidAssignTarget {
         line:       usize,
         column:     usize,
     },

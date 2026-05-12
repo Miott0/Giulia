@@ -84,6 +84,8 @@ name = "giulia-interpreter"
 version = "0.1.0"
 dependencies = [
  "giulia-ast",
+ "giulia-lexer",
+ "giulia-parser",
  "thiserror",
 ]
 

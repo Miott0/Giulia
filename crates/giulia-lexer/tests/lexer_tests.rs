@@ -5,12 +5,12 @@ fn tokens(source: &str) -> Vec<Token> {
         .expect("lex unexpectedly failed")
         .into_iter()
         .map(|st| st.token)
-        .filter(|t| !matches!(t, Token::Newline | Token::Eof)) // Ignore Newline and Eof for tests
+        .filter(|t| !matches!(t, Token::Newline | Token::Eof))
         .collect()
 }
 
 #[test]
-fn keywords_recognized() {
+fn keywords_reconhecidos() {
     let result = tokens("agent on fn let return if else while for in use do");
     assert_eq!(result[0],  Token::Agent);
     assert_eq!(result[1],  Token::On);
@@ -27,7 +27,25 @@ fn keywords_recognized() {
 }
 
 #[test]
-fn identifier_not_confused_with_keyword() {
+fn novos_keywords_fase2_parseados() {
+    let result = tokens("send channel priority concurrent");
+    assert_eq!(result[0], Token::Send);
+    assert_eq!(result[1], Token::Channel);
+    assert_eq!(result[2], Token::Priority);
+    assert_eq!(result[3], Token::Concurrent);
+}
+
+#[test]
+fn priority_levels_reconhecidos() {
+    let result = tokens("critical high normal low");
+    assert_eq!(result[0], Token::PriorityCritical);
+    assert_eq!(result[1], Token::PriorityHigh);
+    assert_eq!(result[2], Token::PriorityNormal);
+    assert_eq!(result[3], Token::PriorityLow);
+}
+
+#[test]
+fn identifier_nao_confundido_com_keyword() {
     let result = tokens("agent_name agenter");
     assert_eq!(result[0], Token::Identifier("agent_name".into()));
     assert_eq!(result[1], Token::Identifier("agenter".into()));
@@ -42,7 +60,7 @@ fn numeric_literals_basic() {
 }
 
 #[test]
-fn scientific_numbers() {
+fn literais_numericos_com_prioridade_correta() {
     let toks = tokens("42 3.14 1e4 1.23E-4");
     match &toks[0] { Token::Integer(n) => assert_eq!(*n, 42), _ => panic!("expected Integer") }
     match &toks[1] { Token::Float(f) => assert!((f - 3.14).abs() < 1e-12), _ => panic!("expected Float") }
@@ -57,7 +75,7 @@ fn string_literal() {
 }
 
 #[test]
-fn two_char_operators_before_one_char() {
+fn operadores_dois_chars_antes_de_um() {
     let result = tokens("== != <= >= < > =");
     assert_eq!(result[0], Token::EqEq);
     assert_eq!(result[1], Token::NotEq);
@@ -69,7 +87,7 @@ fn two_char_operators_before_one_char() {
 }
 
 #[test]
-fn comments_ignored_single_line() {
+fn comentario_single_line_ignorado() {
     let result = tokens("let x = 42 /: comment\nlet y = 2");
     assert_eq!(result[0], Token::Let);
     assert_eq!(result[1], Token::Identifier("x".into()));
@@ -82,7 +100,7 @@ fn comments_ignored_single_line() {
 }
 
 #[test]
-fn comments_ignored_multi_line() {
+fn comentario_multi_line_ignorado() {
     let src = "let x = 1 /: comment\nmultiline\nuntil here :/ let y = 2";
     let result = tokens(src);
     assert_eq!(result[0], Token::Let);
@@ -102,9 +120,22 @@ fn invalid_character_returns_error() {
 }
 
 #[test]
-fn line_and_column_correct() {
+fn linha_e_coluna_corretos() {
     let result = lex("let x = 1\nlet y = 2").unwrap();
     let let_tokens: Vec<_> = result.iter().filter(|st| st.token == Token::Let).collect();
     assert_eq!(let_tokens[0].line, 1);
     assert_eq!(let_tokens[1].line, 2);
+}
+
+#[test]
+fn erro_com_posicao_correta() {
+    let errs = lex("let x = @bad").unwrap_err();
+    assert_eq!(errs.len(), 1);
+    assert_eq!(errs[0].to_string(), "Unexpected character '@' at line 1, column 9");
+}
+
+#[test]
+fn multiplos_erros_coletados() {
+    let errs = lex("@a @b @c").unwrap_err();
+    assert_eq!(errs.len(), 3);
 }

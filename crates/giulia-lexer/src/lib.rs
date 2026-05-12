@@ -13,10 +13,6 @@ pub fn lex(source: &str) -> LexResult {
     let mut tokens: Vec<SpannedToken> = Vec::new();
     let mut errors: Vec<LexError> = Vec::new();
 
-    // Pré-processar comentários multilinha `/: ... :/` porque logos não lida bem
-    // com quantificadores que atravessam múltiplas linhas de forma não-ambígua.
-    // Estratégia: gerar uma cópia dos bytes onde cada caractere dentro do comentário
-    // é substituído por espaço (exceto '\n'), preservando índices/posições.
     let mut out_bytes = source.as_bytes().to_vec();
     let mut search_start = 0usize;
     while let Some(rel_start) = source[search_start..].find("/:") {
@@ -26,8 +22,7 @@ pub fn lex(source: &str) -> LexResult {
         let rel_nl = after.find('\n');
 
         if let Some(re) = rel_end {
-            // Encontrou encerramento ":/" — tratar como comentário multilinha
-            let end = start + 2 + re + 2; // índice byte logo após `:/`
+            let end = start + 2 + re + 2;
             for i in start..end {
                 if out_bytes[i] != b'\n' {
                     out_bytes[i] = b' ';
@@ -35,17 +30,14 @@ pub fn lex(source: &str) -> LexResult {
             }
             search_start = end;
         } else if let Some(nl) = rel_nl {
-            // Não há ":/" antes de newline — tratar como comentário single-line
-            let end = start + 2 + nl; // posição do '\n'
+            let end = start + 2 + nl;
             for i in start..end {
                 if out_bytes[i] != b'\n' {
                     out_bytes[i] = b' ';
                 }
             }
-            // continuar busca após o fim do comentário (posicionado no newline)
             search_start = end + 1;
         } else {
-            // Não há ":/" nem newline — comentário vai até EOF (single-line até EOF)
             for i in start..out_bytes.len() {
                 if out_bytes[i] != b'\n' {
                     out_bytes[i] = b' ';

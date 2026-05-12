@@ -1,23 +1,21 @@
+use crate::policies::{AiPolicy, ChannelDecl, ErrorPolicy, EventPolicy, EventPriorityLevel};
 use crate::types::TypeExpr;
 
-//posicao no source code, presente em todos os nos
-//sem span na ha mensagens de erro uteis
-
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
-pub struct Span{
-    pub start:  usize,
-    pub end:    usize,
+pub struct Span {
+    pub start: usize,
+    pub end:   usize,
 }
 
-//PROGRAMA
+// ─── PROGRAMA ────────────────────────────────────────────────────
 
 #[derive(Debug, Clone)]
-pub struct Program{
+pub struct Program {
     pub stmts: Vec<Stmt>,
-    pub span: Span,
+    pub span:  Span,
 }
 
-//STATEMENTS
+// ─── STATEMENTS ──────────────────────────────────────────────────
 
 #[derive(Debug, Clone)]
 pub enum Stmt {
@@ -29,17 +27,26 @@ pub enum Stmt {
     WhileStmt(WhileStmt),
     ForStmt(ForStmt),
     ReturnStmt(ReturnStmt),
-    EffectStmt(EffectStmt),//'do expr' marcardor de side effect(Fase 4, sintaxe existe na fase 1, mas é apenas um marcador)
+    EffectStmt(EffectStmt),
+    SendStmt(SendStmt),
     ExprStmt(ExprStmt),
 }
 
 #[derive(Debug, Clone)]
-pub struct AgentDecl{
-    pub name:       String,
-    pub uses:       Vec<UseDecl>, //capbilities usadas pelo agente
-    pub handlers:   Vec<HandlerDecl>, //funcoes que o agente pode executar
-    pub fns:        Vec<FnDecl>, //funcoes auxiliares do agente
-    pub span:       Span,
+pub struct AgentDecl {
+    pub name:         String,
+    pub version:      Option<u64>,
+
+    pub capabilities: Vec<UseDecl>,
+    pub handlers:     Vec<HandlerDecl>,
+    pub functions:    Vec<FnDecl>,
+
+    pub error_policy: Option<ErrorPolicy>,
+    pub event_policy: Option<EventPolicy>,
+    pub ai_policy:    Option<AiPolicy>,
+    pub channels:     Vec<ChannelDecl>,
+
+    pub span: Span,
 }
 
 #[derive(Debug, Clone)]
@@ -49,56 +56,71 @@ pub struct UseDecl {
 }
 
 #[derive(Debug, Clone)]
-pub struct FnDecl {
-    pub name: String,
-    pub params: Vec<Param>,
-    pub return_type: Option<TypeExpr>,
-    pub body: Block,
-    pub span: Span,
-}
-
-#[derive(Debug, Clone)]
 pub struct HandlerDecl {
-    pub event:  EventPattern,
-    pub body:   Block,
-    pub span:   Span,
+    pub event:      EventPattern,
+    pub priority:   EventPriorityLevel,
+    pub concurrent: bool,
+    pub body:       Block,
+    pub span:       Span,
 }
 
 #[derive(Debug, Clone)]
-pub enum EventPattern{
-    Start, 
-    Stop, 
-    Timer(Expr), //on timer(1000)
-    Message(String), //on message("topic")
-    Custom(String), //on my_event
+pub enum EventPattern {
+    Start,
+    Stop,
+    Timer(Expr),
+    Message(MessageTarget),
+    Speech,
+    Image,
+    SensorChange(String),
+    Network(String),
+    Idle(Expr),
+    Custom(String),
+}
+
+#[derive(Debug, Clone)]
+pub enum MessageTarget {
+    Simple(String),
+    Typed { agent: String, channel: String },
+}
+
+#[derive(Debug, Clone)]
+pub struct FnDecl {
+    pub name:        String,
+    pub params:      Vec<Param>,
+    pub return_type: Option<TypeExpr>,
+    pub body:        Block,
+    pub span:        Span,
 }
 
 #[derive(Debug, Clone)]
 pub struct Param {
-    pub name:               String,
-    pub type_annotation:    Option<TypeExpr>,
-    pub span:               Span,
-}   
+    pub name:            String,
+    pub type_annotation: Option<TypeExpr>,
+    pub span:            Span,
+}
 
 #[derive(Debug, Clone)]
 pub struct Block {
     pub stmts: Vec<Stmt>,
-    pub span: Span,    
+    pub span:  Span,
 }
+
+// ─── STATEMENTS CONCRETOS ────────────────────────────────────────
 
 #[derive(Debug, Clone)]
 pub struct LetStmt {
-    pub name: String,
+    pub name:     String,
     pub type_ann: Option<TypeExpr>,
-    pub value: Expr, 
-    pub span: Span,
+    pub value:    Expr,
+    pub span:     Span,
 }
 
 #[derive(Debug, Clone)]
 pub struct AssignStmt {
-    pub name: String,
+    pub name:  String,
     pub value: Expr,
-    pub span: Span,    
+    pub span:  Span,
 }
 
 #[derive(Debug, Clone)]
@@ -118,8 +140,8 @@ pub enum ElseBranch {
 #[derive(Debug, Clone)]
 pub struct WhileStmt {
     pub condition: Expr,
-    pub body: Block,
-    pub span: Span,        
+    pub body:      Block,
+    pub span:      Span,
 }
 
 #[derive(Debug, Clone)]
@@ -133,22 +155,31 @@ pub struct ForStmt {
 #[derive(Debug, Clone)]
 pub struct ReturnStmt {
     pub value: Option<Expr>,
-    pub span: Span,        
+    pub span:  Span,
 }
 
 #[derive(Debug, Clone)]
 pub struct EffectStmt {
     pub expr: Expr,
-    pub span: Span,    
+    pub span: Span,
+}
+
+#[derive(Debug, Clone)]
+pub struct SendStmt {
+    pub target_agent: String,
+    pub channel:      Option<String>,
+    pub topic:        Option<String>,
+    pub payload:      Expr,
+    pub span:         Span,
 }
 
 #[derive(Debug, Clone)]
 pub struct ExprStmt {
     pub expr: Expr,
-    pub span: Span,    
+    pub span: Span,
 }
 
-//EXPRESSOES
+// ─── EXPRESSÕES ──────────────────────────────────────────────────
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Expr {
@@ -185,7 +216,6 @@ pub enum Expr {
 }
 
 impl Expr {
-    /// Retorna o Span do nó raiz desta expressão.
     pub fn span(&self) -> Span {
         match self {
             Expr::Literal(_, s)          => *s,
@@ -193,7 +223,7 @@ impl Expr {
             Expr::BinOp    { span, .. }  => *span,
             Expr::UnaryOp  { span, .. }  => *span,
             Expr::Call     { span, .. }  => *span,
-            Expr::FieldAccess { span, .. }=> *span,
+            Expr::FieldAccess { span, .. } => *span,
             Expr::Index    { span, .. }  => *span,
             Expr::List     (_, s)        => *s,
             Expr::Map      (_, s)        => *s,
@@ -201,12 +231,13 @@ impl Expr {
     }
 }
 
+// ─── LITERAIS ────────────────────────────────────────────────────
 
-//LITERAIS
 #[derive(Debug, Clone, PartialEq)]
 pub enum Literal {
     Int(i64),
     Float(f64),
+    Scientific(f64),
     String(String),
     Bool(bool),
     Null,
@@ -214,18 +245,17 @@ pub enum Literal {
     Map(Vec<(Expr, Expr)>),
 }
 
-//OPERADORES
+// ─── OPERADORES ──────────────────────────────────────────────────
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum BinOp {
     Add, Sub, Mul, Div, Rem,
-    Eq, NotEq,
-    Lt, Gt, LtEq, GtEq,
+    Eq, NotEq, Lt, Gt, LtEq, GtEq,
     And, Or,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum UnaryOp {
-    Neg,  // -x
-    Not,  // not x
+    Neg,
+    Not,
 }

@@ -1,5 +1,15 @@
-//! crl-parser
-// Skeleton crate for the CRL parser (Phase 1).
+mod error;
+mod parser;
 
-/// Placeholder: parser implementation will be added following the spec.
-pub fn placeholder() {}
+
+pub use error::ParseError;
+pub use parser::Parser;
+
+use giulia_lexer::token::SpannedToken;
+use giulia_ast::node::Program;
+
+pub fn parse(tokens: Vec<SpannedToken>) -> Result<Program, Vec<ParseError>> {
+    Parser::new(tokens).parse_program()    
+}
+
+

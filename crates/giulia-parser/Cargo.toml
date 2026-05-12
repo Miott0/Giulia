@@ -1,0 +1,14 @@
+[package]
+name = "giulia-parser"
+version = "0.1.0"
+edition = "2021"
+description = "Parser (recursive descent) for CRL (Giulia project, Phase 1)"
+authors = ["Rafael Miotte <dev.miotte@gmail.com>"]
+repository = "https://github.com/Miott0/Giulia"
+license = "MIT"
+
+[dependencies]
+giulia-lexer = { path = "../giulia-lexer" }
+giulia-ast = { path = "../giulia-ast" }
+thiserror = { workspace = true }
+miette = { workspace = true }

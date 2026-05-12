@@ -54,47 +54,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
 
 [[package]]
-name = "crl"
-version = "0.1.0"
-dependencies = [
- "crl-interpreter",
- "crl-lexer",
- "crl-parser",
- "miette",
-]
-
-[[package]]
-name = "crl-ast"
-version = "0.1.0"
-
-[[package]]
-name = "crl-interpreter"
-version = "0.1.0"
-dependencies = [
- "crl-ast",
- "thiserror",
-]
-
-[[package]]
-name = "crl-lexer"
-version = "0.1.0"
-dependencies = [
- "logos",
- "miette",
- "thiserror",
-]
-
-[[package]]
-name = "crl-parser"
-version = "0.1.0"
-dependencies = [
- "crl-ast",
- "crl-lexer",
- "miette",
- "thiserror",
-]
-
-[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -105,6 +64,49 @@ name = "gimli"
 version = "0.32.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e629b9b98ef3dd8afe6ca2bd0f89306cec16d43d907889945bc5d6687f2f13c7"
+
+[[package]]
+name = "giulia"
+version = "0.1.0"
+dependencies = [
+ "giulia-interpreter",
+ "giulia-lexer",
+ "giulia-parser",
+ "miette",
+]
+
+[[package]]
+name = "giulia-ast"
+version = "0.1.0"
+
+[[package]]
+name = "giulia-interpreter"
+version = "0.1.0"
+dependencies = [
+ "giulia-ast",
+ "giulia-lexer",
+ "giulia-parser",
+ "thiserror",
+]
+
+[[package]]
+name = "giulia-lexer"
+version = "0.1.0"
+dependencies = [
+ "logos",
+ "miette",
+ "thiserror",
+]
+
+[[package]]
+name = "giulia-parser"
+version = "0.1.0"
+dependencies = [
+ "giulia-ast",
+ "giulia-lexer",
+ "miette",
+ "thiserror",
+]
 
 [[package]]
 name = "hermit-abi"

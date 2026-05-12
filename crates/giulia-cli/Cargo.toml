@@ -1,0 +1,18 @@
+[package]
+name = "giulia"
+version = "0.1.0"
+edition = "2021"
+description = "CRL CLI (Giulia project)"
+authors = ["Rafael Miotte <dev.miotte@gmail.com>"]
+repository = "https://github.com/Miott0/Giulia"
+license = "MIT"
+
+[[bin]]
+name = "giulia"
+path = "src/main.rs"
+
+[dependencies]
+giulia-lexer = { path = "../giulia-lexer" }
+giulia-parser = { path = "../giulia-parser" }
+giulia-interpreter = { path = "../giulia-interpreter" }
+miette = { workspace = true }

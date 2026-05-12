@@ -1,0 +1,16 @@
+[package]
+name = "giulia-interpreter"
+version = "0.1.0"
+edition = "2021"
+description = "AST-walking interpreter for CRL (Giulia project, Phase 1)"
+authors = ["Rafael Miotte <dev.miotte@gmail.com>"]
+repository = "https://github.com/Miott0/Giulia"
+license = "MIT"
+
+[dependencies]
+giulia-ast = { path = "../giulia-ast" }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+giulia-lexer = { path = "../giulia-lexer" }
+giulia-parser = { path = "../giulia-parser" }

@@ -1,0 +1,6 @@
+/: Teste 1: hello world :/
+agent main { 
+    on start { 
+        print("Hello, Cognitive Runtime") 
+    } 
+}
